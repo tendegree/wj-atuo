@@ -12,6 +12,27 @@ jobs:
     permissions:
       contents: write
 
+    # 通知渠道配置（可选，配置后自动启用对应渠道，可同时启用多个）
+    env:
+      WECOM_BOT_KEY: ${{ secrets.WECOM_BOT_KEY }}
+      DINGTALK_BOT_KEY: ${{ secrets.DINGTALK_BOT_KEY }}
+      DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
+      FEISHU_BOT_KEY: ${{ secrets.FEISHU_BOT_KEY }}
+      YUNHU_BOT_KEY: ${{ secrets.YUNHU_BOT_KEY }}
+      SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+      PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+      PUSHPLUS_TOPIC: ${{ secrets.PUSHPLUS_TOPIC }}
+      TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+      TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+      BARK_KEY: ${{ secrets.BARK_KEY }}
+      BARK_GROUP: ${{ secrets.BARK_GROUP }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USER: ${{ secrets.MAIL_USER }}
+      MAIL_PASS: ${{ secrets.MAIL_PASS }}
+      MAIL_TO: ${{ secrets.MAIL_TO }}
+
     steps:
       - name: 检出仓库
         uses: actions/checkout@v4
@@ -48,3 +69,6 @@ jobs:
             git push
             echo "保活提交成功"
           fi
+
+      - name: 发送保活成功通知
+        run: node keepalive-notify.js
