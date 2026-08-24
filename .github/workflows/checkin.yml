@@ -28,9 +28,10 @@ jobs:
   checkin:
     # 运行环境
     runs-on: ubuntu-latest
-    
-    # 增加一个if条件，确保即使配置错误，也只在dev分支上运行
-    if: github.ref == 'refs/heads/dev'
+
+    # 说明：定时任务(schedule)只会运行在仓库默认分支(main)上，
+    # 因此不能按分支限制 if 条件，否则会被永久跳过。
+    # checkout 步骤已显式检出 dev 分支代码，实际执行的都是 dev 代码。
 
     steps:
       # 步骤一：检出 dev 分支的代码
