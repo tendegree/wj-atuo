@@ -5,7 +5,7 @@
  */
 const { sendNotify } = require('./utils/notify.js');
 
-const title = '仓库保活执行成功';
+const title = 'wj-auto仓库保活执行成功';
 const content = `📅 时间: ${new Date().toLocaleString()}\n✅ 仓库保活 Action 执行完成，仓库保持活跃。`;
 
 sendNotify(title, content)
