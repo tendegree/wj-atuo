@@ -1,0 +1,53 @@
+# 工作流名称
+name: WJKC Daily Check-in (Dev Branch)
+
+on:
+  # 触发条件
+  # 1. 定时触发：只在 dev 分支上定时运行
+  schedule:
+    - cron: '0 18 * * *'
+  
+  # 2. 手动/推送触发：只在对 dev 分支进行 push 或手动触发时运行
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'info'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+
+# 任务定义
+jobs:
+  checkin:
+    # 运行环境
+    runs-on: ubuntu-latest
+    
+    # 增加一个if条件，确保即使配置错误，也只在dev分支上运行
+    if: github.ref == 'refs/heads/dev'
+
+    steps:
+      # 步骤一：检出 dev 分支的代码
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          ref: dev # 明确指定检出 dev 分支
+
+      # 步骤二：设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 步骤三：运行签到脚本
+      - name: Run WJKC Login & Check-in Script
+        run: node index.js
+        env:
+          WJKC_CREDENTIALS: ${{ secrets.WJKC_CREDENTIALS }}
+          NOTIFY: ${{ secrets.NOTIFY }}
