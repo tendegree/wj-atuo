@@ -141,30 +141,56 @@ const runCheckinForAccount = async (token) => {
 /**
  * 推送通知
  */
+/**
+ * 推送通知 (飞书机器人版)
+ */
 const notify = async (title, body) => {
     const notifyConfig = process.env.NOTIFY;
     if (!notifyConfig || !body) return;
 
-    const pushplusToken = notifyConfig.split('\n').find(line => line.startsWith('pushplus:'))?.split(':')[1];
-    if (!pushplusToken) return;
+    // 1. 解析配置：寻找以 "feishu:" 开头的行
+    // 假设你的 Secrets 格式为：feishu:https://open.feishu.cn/open-apis/bot/v2/hook/xxxx
+    const feishuWebhook = notifyConfig.split('\n').find(line => line.startsWith('feishu:'))?.split(':')[1];
+    
+    if (!feishuWebhook) {
+        console.log("未找到有效的飞书 Webhook 配置");
+        return;
+    }
 
     try {
-        await fetch('https://www.pushplus.plus/send', {
+        // 2. 构建飞书消息体
+        // 飞书 Webhook 支持 text, post, image 等类型。这里使用 'post' 类型以支持标题和换行。
+        const payload = {
+            msg_type: "post",
+            content: {
+                post: {
+                    zh_cn: {
+                        title: title || "通知", // 飞书 Post 消息必须包含标题
+                        content: [
+                            [
+                                {
+                                    tag: "text",
+                                    text: body.replace(/<br>/g, '\n') // 将 HTML 换行转回文本换行，适配飞书显示
+                                }
+                            ]
+                        ]
+                    }
+                }
+            }
+        };
+
+        // 3. 发送请求
+        await fetch(feishuWebhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                token: pushplusToken,
-                title,
-                content: body.replace(/\n/g, '<br>'),
-                template: 'markdown',
-            }),
+            body: JSON.stringify(payload),
         });
-        console.log("PushPlus 通知已发送。");
+        
+        console.log("飞书通知已发送。");
     } catch (e) {
-        console.error("发送通知失败:", e.message);
+        console.error("发送飞书通知失败:", e.message);
     }
 };
-
 /**
  * 程序入口
  */
