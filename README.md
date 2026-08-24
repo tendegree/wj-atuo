@@ -14,7 +14,7 @@
 - **全自动化**：一次配置，每日自动执行。
 - **多账号支持**：支持配置多个账号，并为每个账号设置别名。
 - **安全可靠**：使用 GitHub Secrets 存储账号密码，确保凭证安全。
-- **实时通知**：通过 PushPlus 发送详细的签到结果报告。
+- **实时通知**：支持**飞书、钉钉、企业微信、Server酱、PushPlus、Telegram、Bark、Discord、云湖、邮箱 SMTP** 等多种渠道通知签到结果。
 
 ---
 
@@ -41,15 +41,42 @@
       user2@example.com,another_password
       ```
 
--   **`NOTIFY` (可选，推荐配置)**
-    -   **Name**: `NOTIFY`
-    -   **Value**: 你的通知渠道配置。
-    -   **PushPlus 示例**:
-      ```
-      pushplus:你的PushPlus_Token
-      ```
+### 3. （可选）配置通知渠道 🔔
 
-### 3. 启用并运行 Action
+> 通知功能完全可选。仅需要配置**一个或多个**你使用的渠道即可，其余渠道留空（不添加对应的 Secret）即可。所有渠道可同时启用。
+
+下表列出了全部支持的通知渠道及其对应的 Secret（Name）。按需要逐个添加即可：
+
+| 渠道 | Secret 名称 | 说明 |
+| --- | --- | --- |
+| 飞书机器人 | `FEISHU_BOT_KEY` | 飞书自定义机器人 Webhook 地址后的 token 部分 |
+| 钉钉机器人 | `DINGTALK_BOT_KEY` | 钉钉自定义机器人 `access_token` |
+| | `DINGTALK_SECRET` | （可选）钉钉机器人加签密钥，配置了启用加签 |
+| 企业微信机器人 | `WECOM_BOT_KEY` | 企业微信群机器人 Webhook `key` |
+| 云湖机器人 | `YUNHU_BOT_KEY` | 云湖机器人 Webhook key |
+| Server酱 | `SERVERCHAN_SENDKEY` | Server酱 (sct) `SendKey` |
+| PushPlus | `PUSHPLUS_TOKEN` | PushPlus Token（推荐） |
+| | `PUSHPLUS_TOPIC` | （可选）PushPlus `topic` 群组编码 |
+| Telegram | `TG_BOT_TOKEN` | Telegram Bot Token |
+| | `TG_CHAT_ID` | 接收通知的 Chat ID |
+| Bark (iOS) | `BARK_KEY` | Bark 设备 key 或完整推送地址 |
+| | `BARK_GROUP` | （可选）Bark 分组 |
+| Discord | `DISCORD_WEBHOOK` | Discord Webhook 完整 URL |
+| 邮箱 SMTP | `MAIL_HOST` | SMTP 服务器地址 |
+| | `MAIL_PORT` | （可选，默认 `465`）SMTP 端口 |
+| | `MAIL_USER` | SMTP 账号（发件邮箱） |
+| | `MAIL_PASS` | SMTP 密码/授权码 |
+| | `MAIL_TO` | 收件邮箱 |
+
+**飞书机器人为例：**
+
+1. 在飞书群 → 群设置 → 群机器人 → 添加「自定义机器人」。
+2. 复制 Webhook 地址，`https://open.feishu.cn/open-apis/bot/v2/hook/<token>`，将 `<token>` 部分填入 Secret `FEISHU_BOT_KEY`。
+3. 在仓库 `Settings -> Secrets and variables -> Actions` 中新建 Secret，Name 填 `FEISHU_BOT_KEY`，Value 填 token 即可。
+
+> 旧版使用单一 `NOTIFY` 变量配置 PushPlus 的方式已被多渠道通知取代，可直接改用上表中的 `PUSHPLUS_TOKEN`。
+
+### 4. 启用并运行 Action
 
 1.  进入你的仓库，点击上方的 **`Actions`** 标签页。
 2.  在左侧的工作流列表中，点击 **`WJKC Daily Check-in (Dev Branch)`**。

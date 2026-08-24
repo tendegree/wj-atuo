@@ -1,11 +1,12 @@
 /**
  * 网际快车 (wjkc.click) 自动化脚本 - 2025修复版
  * 
- * 功能：模拟登录、提取Token、自动签到、多账号支持、PushPlus推送
+ * 功能：模拟登录、提取Token、自动签到、多账号支持、多渠道通知（飞书/钉钉等）
  * 环境要求：Node.js 18+ (自带 fetch)
  */
 
 const crypto = require('crypto');
+const { sendNotify } = require('./utils/notify.js');
 
 // 配置信息（可通过环境变量设置）
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36 EdgA/143.0.0.0';
@@ -139,31 +140,10 @@ const runCheckinForAccount = async (token) => {
 };
 
 /**
- * 推送通知
+ * 通知功能已迁移至多渠道模块 utils/notify.js：
+ * 支持飞书、钉钉、企业微信、Server酱、PushPlus、Telegram、Bark、Discord、云湖、邮箱 SMTP。
+ * 通过环境变量 / GitHub Secrets 配置，多个渠道可同时启用。
  */
-const notify = async (title, body) => {
-    const notifyConfig = process.env.NOTIFY;
-    if (!notifyConfig || !body) return;
-
-    const pushplusToken = notifyConfig.split('\n').find(line => line.startsWith('pushplus:'))?.split(':')[1];
-    if (!pushplusToken) return;
-
-    try {
-        await fetch('https://www.pushplus.plus/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                token: pushplusToken,
-                title,
-                content: body.replace(/\n/g, '<br>'),
-                template: 'markdown',
-            }),
-        });
-        console.log("PushPlus 通知已发送。");
-    } catch (e) {
-        console.error("发送通知失败:", e.message);
-    }
-};
 
 /**
  * 程序入口
@@ -205,10 +185,18 @@ const main = async () => {
         if (i < accounts.length - 1) await new Promise(r => setTimeout(r, 3000));
     }
 
-    const reportTitle = `网际快车签到: ${successCount}/${accounts.length} 成功`;
-    const reportBody = results.join('\n\n---\n\n');
-    
-    await notify(reportTitle, reportBody);
+    // 构建通知内容
+    const reportTitle = `网际快车签到${successCount === accounts.length ? '成功' : '异常'} ${new Date().toLocaleDateString()}`;
+    let reportBody = `📊 账号数: ${accounts.length}\n`;
+    reportBody += `✅ 成功: ${successCount}  ❌ 失败: ${accounts.length - successCount}\n`;
+    reportBody += `\n` + results.join('\n\n---\n\n');
+
+    // 发送多渠道通知（失败不影响主流程）
+    try {
+        await sendNotify(reportTitle, reportBody);
+    } catch (e) {
+        console.error("发送通知异常:", e.message);
+    }
     console.log("--- 任务执行完毕 ---");
 };
 
