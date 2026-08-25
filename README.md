@@ -84,6 +84,34 @@
 4.  测试成功后，脚本将在预设的时间（默认为每天北京时间凌晨 2:00）自动运行。
 
 ---
+## ☁️ Cloudflare Workers 部署
+
+除 GitHub Actions 外，本项目还提供 `worker.js`，可直接部署到 Cloudflare Workers，功能与 Node 版一致（登录、签到、多渠道通知）。
+
+1. 进入 [Cloudflare Dashboard](https://dash.cloudflare.com) → Workers & Pages → **Create** → **Worker**。
+2. 将 [worker.js](worker.js) 内容粘贴到编辑器并保存。
+3. 配置 Cron 触发器（与 Actions 定时一致）：**Triggers → Cron Triggers → Add Cron Trigger**，表达式如 `0 18 * * *`（对应北京时间 02:00）。
+4. 在 **Settings → Variables and Secrets** 中添加以下变量：
+
+| 变量 | 说明 |
+| --- | --- |
+| `admin` | 管理面板登录密码（可选，配置后访问 Worker 域名可登录面板手动签到/测试推送） |
+| `WJKC_CREDENTIALS` (必需) | 账号用 `;` 分隔，每账号 `邮箱,密码,别名`（与 Actions 格式一致，支持多账号。注意：Worker 的 Secret 变量**不支持换行**，故用 `;` 分隔） |
+| `WECOM_BOT_KEY` | 企业微信机器人 key（可选） |
+| `DINGTALK_BOT_KEY` / `DINGTALK_SECRET` | 钉钉机器人（可选，可加签） |
+| `FEISHU_BOT_KEY` | 飞书机器人（可选） |
+| `YUNHU_BOT_KEY` | 云湖机器人（可选） |
+| `SERVERCHAN_SENDKEY` | Server酱（可选） |
+| `PUSHPLUS_TOKEN` / `PUSHPLUS_TOPIC` | PushPlus（可选） |
+| `TG_BOT_TOKEN` / `TG_CHAT_ID` | Telegram（可选） |
+| `BARK_KEY` / `BARK_GROUP` | Bark（可选） |
+| `DISCORD_WEBHOOK` | Discord（可选） |
+
+> 便捷性：`WJKC_CREDENTIALS` 及通知变量均使用不含特殊字符的命名，可直接作为 Worker 变量绑定。
+> 限制：Worker 运行时无法使用 SMTP，因此邮箱通知渠道在 `worker.js` 中不支持；其余渠道均可用。
+
+---
+
 ## 🚀 开发与部署流程
 
 本项目使用 `dev` 分支作为开发和测试分支，`main` 分支作为稳定的生产分支。
