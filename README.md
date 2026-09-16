@@ -1,8 +1,8 @@
-# WJKC Auto Check-in Action 🚀
+# WJKC Auto Check-in Action
 
 这是一个基于 GitHub Actions 的自动化脚本，用于每日自动在**网际快车 (wj-kc.com)** 网站执行签到任务，以获取每日奖励。
 
-[![WJKC Check-in (Dev)](https://github.com/ZZ0YY/wjkc-checkin/actions/workflows/checkin.yml/badge.svg?branch=dev)](https://github.com/ZZ0YY/wjkc-checkin/actions)
+源项目：https://github.com/ZZ0YY/wjkc-checkin
 
 > **免责声明**: 本项目仅用于学习和技术研究。请在遵守目标网站用户协议的前提下使用。因使用本项目而导致的任何问题，项目作者概不负责。
 
